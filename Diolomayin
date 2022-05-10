@@ -1,0 +1,101 @@
+#include <iostream>
+#include <list>
+#include <fstream>
+using namespace std;
+class Graph {
+
+    list<int>* adj;
+    bool* visited;
+    int V;
+    void DFS(int v, bool visited[]);
+public:
+    Graph(int V)
+    {
+        this->V = V;
+        adj = new list<int>[V];
+        visited = new bool[V];
+    }
+    ~Graph() 
+    {
+        delete[] adj;
+        delete[] visited;
+    }
+    void addEdge(int v, int w);
+    int ConnectedComponents();
+};
+
+int Graph::ConnectedComponents()
+{
+    int count = 0;
+    for (int v = 0; v < V; v++)
+        visited[v] = false;
+    for (int v = 0; v < V; v++)
+    {
+        if (visited[v] == false)
+        {
+            DFS(v, visited);
+            cout << endl << endl;
+            count++;
+        }
+    }
+    return count;
+}
+
+void Graph::DFS(int v, bool visited[])
+{
+    visited[v] = true;
+    cout << v << "  ";
+    list<int>::iterator i;
+    for (i = adj[v].begin(); i != adj[v].end(); ++i)
+        if (!visited[*i])
+            DFS(*i, visited);
+}
+
+void Graph::addEdge(int v, int w)
+{
+    adj[v].push_back(w);
+    adj[w].push_back(v);
+}
+
+int main()
+{
+    ifstream fin("inputs.txt");
+    if (!fin.is_open())
+    {
+        cout << "Incorrect File Name Error";
+    }
+    else
+    {
+        int VerticeCount = 0;
+        fin >> VerticeCount;
+        Graph g(VerticeCount);
+        while (!fin.eof())
+        {
+            int a, b;
+            fin >> a >> b;
+            if (VerticeCount == a || VerticeCount == b)
+            {
+                cout << "The Size is small\n";
+            }
+            else
+            {
+                g.addEdge(a, b);
+            }
+        }
+        fin.close();
+        int compCnt = g.ConnectedComponents();
+        if (compCnt == 1)
+        {
+            cout << endl << "There is " << compCnt << " Connected Component" << endl;
+        }
+        else if (compCnt < 1)
+        {
+            cout << endl << "There isn't Connected Component" << endl;
+        }
+        else
+        {
+            cout << endl << "There are " << compCnt << " Connected Components" << endl;
+        }
+    }
+   return 0;
+}
